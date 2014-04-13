@@ -74,7 +74,7 @@ do
 			if nSize > 0 then
 				for i = 1, nSize do
 					local v = tbl[ i ];
-					if not v then continue end
+					if v == nil then continue end
 					local tv = type( v );
 					-- HANDLE POINTERS
 					if( tv == 'string' )then
