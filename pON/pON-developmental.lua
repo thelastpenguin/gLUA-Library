@@ -170,6 +170,14 @@ do
 	encode['NPC']     = encode['Entity'];
 	encode['NextBot'] = encode['Entity'];
 	
+	encode['nil'] = function()
+		output[ #output + 1 ] = '?';
+	end
+	encode.__index = function( key )
+		ErrorNoHalt('Type: '..key..' can not be encoded. Encoded as as pass-over value.');
+		return encode['nil'];
+	end
+	
 	do
 		local empty, concat = table.Empty, table.concat ;
 		function pon.encode( tbl )
@@ -249,9 +257,10 @@ do
 			end
 			
 			-- READ THE KEY
-			
 			index = index + 1;
 			index, k = self[ tk ]( self, index, str, cache );
+			if not k then continue end
+			
 			-- READ THE VALUE
 			tv = sub( str, index, index );
 			index = index + 1;
@@ -338,7 +347,7 @@ do
 	decode[ 'E' ] = function( self, index, str, cache )
 		if( str[index] == '#' )then
 			index = index + 1;
-			return NULL ;
+			return index, NULL ;
 		else
 			local finish = find( str, ';', index, true );
 			local num = tonumber( sub( str, index, finish - 1 ) );
@@ -353,6 +362,11 @@ do
 		index = finish + 1;
 		return index, Entity( num ) or NULL;
 	end
+	-- NIL
+	decode['?'] = function( self, index, str, cache )
+		return index + 1, nil;
+	end
+
 	
 	function pon.decode( data )
 		local _, res = decode[sub(data,1,1)]( decode, 2, data, {});
