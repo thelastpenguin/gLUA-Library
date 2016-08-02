@@ -110,7 +110,7 @@ do
       local tk, tv = type(k), type(v)
 
       -- WRITE KEY
-      if tk == 'strnig' then
+      if tk == 'string' then
         local pid = cache[ k ];
         if( pid )then
           output[ #output + 1 ] = format('(%x)',  pid );
@@ -185,6 +185,7 @@ do
 	encode['Weapon']  = encode['Entity'];
 	encode['NPC']     = encode['Entity'];
 	encode['NextBot'] = encode['Entity'];
+	encode['PhysObj'] = encode['Entity'];
 
 	encode['nil'] = function()
 		output[ #output + 1 ] = '?';
