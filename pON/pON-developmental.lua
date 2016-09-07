@@ -185,6 +185,7 @@ do
 	encode['Weapon']  = encode['Entity'];
 	encode['NPC']     = encode['Entity'];
 	encode['NextBot'] = encode['Entity'];
+	encode['PhysObj'] = encode['Entity'];
 
 	encode['nil'] = function()
 		output[ #output + 1 ] = '?';
