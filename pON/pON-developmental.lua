@@ -23,6 +23,7 @@ DATA TYPES SUPPORTED:
  - Angles  -		k,v
  - Entities- 		k,v
  - Players - 		k,v
+ - PhysObj - 		k,v
 
 CHANGE LOG
 V 1.1.0
@@ -186,6 +187,7 @@ do
 	encode['NPC']     = encode['Entity'];
 	encode['NextBot'] = encode['Entity'];
 	encode['PhysObj'] = encode['Entity'];
+	encode['CSEnt']   = encode['Entity'];
 
 	encode['nil'] = function()
 		output[ #output + 1 ] = '?';
