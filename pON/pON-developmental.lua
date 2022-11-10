@@ -179,7 +179,8 @@ do
 		output[ #output + 1 ] = ('a'..val.p..','..val.y)..(','..val.r..';');
 	end
 	encode['Entity'] = function( self, val, output )
-		output[ #output + 1] = 'E'..(IsValid( val ) and (val:EntIndex( )..';') or '#');
+		local entIndex = val == NULL and '#' or val:EntIndex();
+		output[ #output + 1] = 'E'..entIndex..';';
 	end
 	encode['Player']  = encode['Entity'];
 	encode['Vehicle'] = encode['Entity'];
@@ -189,7 +190,7 @@ do
 	encode['PhysObj'] = encode['Entity'];
 
 	encode['nil'] = function( _, _, output )
-		output[ #output + 1 ] = '?';
+		output[ #output + 1 ] = '?;';
 	end
 
 	setmetatable( encode, {
@@ -252,7 +253,6 @@ do
 			end
 
 			-- READ THE KEY
-
 			index = index + 1;
 			index, k = self[ tk ]( self, index, str, cache );
 
@@ -371,45 +371,35 @@ do
 	decode[ 'v' ] = function( self, index, str, cache )
 		local finish =  find( str, ';', index, true );
 		local vecStr = sub( str, index, finish - 1 );
-		index = finish + 1; -- update the index.
+		index = finish + 1;
 		local segs = Explode( ',', vecStr, false );
-		return index, Vector( tonumber( segs[1] ), tonumber( segs[2] ), tonumber( segs[3] ) );
+		return index, Vector( segs[1], segs[2], segs[3] );
 	end
 	-- ANGLE
 	decode[ 'a' ] = function( self, index, str, cache )
 		local finish =  find( str, ';', index, true );
 		local angStr = sub( str, index, finish - 1 );
-		index = finish + 1; -- update the index.
+		index = finish + 1;
 		local segs = Explode( ',', angStr, false );
 		return index, Angle( tonumber( segs[1] ), tonumber( segs[2] ), tonumber( segs[3] ) );
 	end
 	-- ENTITY
 	decode[ 'E' ] = function( self, index, str, cache )
-		if( str[index] == '#' )then
-			index = index + 1;
-			return index, NULL ;
-		else
-			local finish = find( str, ';', index, true );
-			local num = tonumber( sub( str, index, finish - 1 ) );
-			index = finish + 1;
-			return index, Entity( num );
-		end
+		local finish = find( str, ';', index, true );
+		local num = sub( str, index, finish - 1 );
+		index = finish + 1;
+		return index, num == '#' and NULL or Entity( num );
 	end
 	-- PLAYER
-	decode[ 'P' ] = function( self, index, str, cache )
-		local finish = find( str, ';', index, true );
-		local num = tonumber( sub( str, index, finish - 1 ) );
-		index = finish + 1;
-		return index, Entity( num ) or NULL;
-	end
+	decode[ 'P' ] = decode[ 'E' ];
 	-- NIL
-	decode['?'] = function( self, index, str, cache )
+	decode[ '?' ] = function( _, index )
 		return index + 1, nil;
 	end
 
 
 	function pon.decode( data )
-		local _, res = decode[sub(data,1,1)]( decode, 2, data, {});
+		local _, res = decode[ sub( data, 1, 1 ) ]( decode, 2, data, {});
 		return res;
 	end
 end
