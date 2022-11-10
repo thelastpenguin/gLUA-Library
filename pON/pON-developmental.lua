@@ -187,15 +187,19 @@ do
 	encode['NPC']     = encode['Entity'];
 	encode['NextBot'] = encode['Entity'];
 	encode['PhysObj'] = encode['Entity'];
-	encode['CSEnt']   = encode['Entity'];
 
-	encode['nil'] = function()
+	encode['nil'] = function( _, _, output )
 		output[ #output + 1 ] = '?';
 	end
-	encode.__index = function( key )
-		ErrorNoHalt('Type: '..key..' can not be encoded. Encoded as as pass-over value.');
-		return encode['nil'];
-	end
+
+	setmetatable( encode, {
+		__index = function( self, key )
+			local val = rawget( self, key );
+			if val then return val end
+			ErrorNoHalt('Type: '..key..' can not be encoded. Encoded as as pass-over value.');
+			return rawget( self, 'nil' );
+		end
+	});
 
 	do
 		local empty, concat = table.Empty, table.concat ;
